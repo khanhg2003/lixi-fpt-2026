@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vòng Quay FPT Telecom - Xuân Bính Ngọ 2026</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --fpt-orange: #F58220;
+            --tet-red: #D91E18;
+            --tet-gold: #FFD700;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            display: flex; flex-direction: column; align-items: center;
+            height: 100vh;
+            user-select: none;
+            position: relative; /* Quan trọng để định vị các lớp giả */
+        }
+
+        /* === XỬ LÝ BACKGROUND CHÍNH CHO MỊN === */
+        /* Lớp 1: Ảnh nền chính (Dùng ::before để xử lý chất lượng ảnh riêng biệt) */
+        body::before {
+            content: '';
+            position: fixed; /* Đảm bảo phủ kín màn hình không bị trượt */
+            inset: 0;
+            background: url('https://i.postimg.cc/0rZFG1Sz/image.png') no-repeat center center;
+            background-size: cover;
+            z-index: -2; /* Nằm dưới cùng */
+
+            /* Cải thiện chất lượng render ảnh khi bị co giãn */
+            image-rendering: -webkit-optimize-contrast; /* Cho Chrome/Safari */
+            image-rendering: high-quality; /* Chuẩn mới */
+            /* Thêm một chút blur cực nhẹ (0.5px) để làm mịn các chi tiết sắc cạnh gây cảm giác bị bể */
+            filter: blur(0.5px);
+        }
+
+        /* Lớp 2: Lớp phủ làm tối (Giữ nguyên hiệu ứng bạn thích) */
+        body::after {
+            content:'';
+            position: fixed;
+            inset:0;
+            background: rgba(0, 0, 0, 0.15); /* Tăng nhẹ lên 0.15 cho đằm màu hơn xíu */
+            z-index:-1; /* Nằm trên ảnh nền, dưới nội dung */
+            pointer-events: none;
+        }
+        /* ====================================== */
+
+
+        /* ==========================================================================
+           MÀN HÌNH CHÀO (WELCOME SCREEN)
+           ========================================================================== */
+        #welcome-screen {
+            position: fixed; inset: 0;
+            /* Background hoa mai */
+            background: url('https://cellphones.com.vn/sforum/wp-content/uploads/2022/12/hinh-nen-powerpoint-tet-15-2.png') no-repeat center center;
+            background-size: cover;
+            z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Lớp phủ mờ để chữ nổi bật trên nền hoa mai */
+        #welcome-screen::before {
+            content: "";
+            position: absolute; inset: 0;
+            background: rgba(255, 255, 255, 0.3); /* Phủ trắng mờ nhẹ */
+            backdrop-filter: blur(2px);
+            z-index: -1;
+        }
+
+        .welcome-content { 
+            text-align: center; 
+            padding: 40px; 
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.85); /* Khung trắng mờ */
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 2px solid #D91E18; /* Viền đỏ */
+            animation: zoomIn 0.8s ease;
+            max-width: 90%;
+        }
+
+        .welcome-logo {
+            margin-bottom: 10px; display: inline-block;
+        }
+        
+        .welcome-title { 
+            font-family: 'Dancing Script', cursive; font-size: 3.5rem; 
+            color: #D91E18; /* Chữ đỏ đậm trên nền sáng */
+            text-shadow: 1px 1px 0 #fff; 
+            margin: 0; line-height: 1.2;
+        }
+        
+        .welcome-subtitle {
+            font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; 
+            margin: 10px 0 30px; color: #333; font-weight: 700;
+        }
+
+        .start-btn {
+            background: linear-gradient(to right, #D91E18, #FF4500);
+            color: #fff; border: none; padding: 15px 60px;
+            font-size: 1.4rem; border-radius: 50px; font-weight: 900; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(217, 30, 24, 0.4);
+            animation: pulseBtn 1.5s infinite; text-transform: uppercase; 
+            font-family: 'Montserrat', sans-serif; letter-spacing: 1px;
+            transition: transform 0.2s;
+        }
+        .start-btn:hover { transform: scale(1.05); }
+        .start-btn:active { transform: scale(0.95); }
+
+        @keyframes zoomIn { from {opacity: 0; transform: scale(0.8);} to {opacity: 1; transform: scale(1);} }
+        @keyframes pulseBtn { 0% {transform: scale(1);} 50% {transform: scale(1.05);} 100% {transform: scale(1);} }
+        /* ========================================================================== */
+
+
+        /* --- HOA RƠI --- */
+        #petal-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+        .petal {
+            position: absolute; top: -20px;
+            border-radius: 150% 0 150% 0;
+            animation: fall infinite linear;
+        }
+        @keyframes fall {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0.9; }
+            100% { transform: translate(100px, 110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- HEADER --- */
+        header { z-index: 10; text-align: center; margin-top: 3vh; position: relative; }
+        .logo-container {
+            background: #fff; padding: 10px 30px; border-radius: 50px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.7); display: inline-block;
+            margin-bottom: 15px; border: 2px solid var(--tet-gold);
+            animation: floatLogo 3s ease-in-out infinite;
+        }
+        @keyframes floatLogo { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-5px);} }
+        .logo-container img { height: 50px; display: block; }
+
+        h1 {
+            font-family: 'Dancing Script', cursive; color: var(--tet-gold);
+            font-size: 3.5rem; margin: 0; text-shadow: 3px 3px 0 #900, 0 0 20px #FFFF00; line-height: 1.1;
+        }
+        h2 {
+            font-size: 1.5rem; margin: 5px 0 0; text-transform: uppercase; letter-spacing: 2px; font-weight: 900;
+            background: linear-gradient(to bottom, #FFFF00, #FFD700, #DAA520);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(2px 2px 0px #900); font-family: 'Montserrat', sans-serif;
+        }
+
+        /* --- VÒNG QUAY --- */
+        .wheel-wrapper {
+            position: relative; width: 360px; max-width: 90vw; aspect-ratio: 1/1;
+            margin: 2vh auto; z-index: 5;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .wheel-border {
+            position: absolute; inset: -18px; border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FDB931, #FFD700);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8), inset 0 0 10px rgba(255,255,255,0.5);
+            z-index: 0;
+        }
+
+        .lights-ring { position: absolute; inset: 5px; border-radius: 50%; pointer-events: none; }
+        .bulb {
+            position: absolute; width: 10px; height: 10px; border-radius: 50%;
+            background: #fff; box-shadow: 0 0 8px #fff;
+            animation: blink 1s infinite alternate;
+        }
+        @keyframes blink { from {opacity: 1; transform: scale(1);} to {opacity: 0.4; transform: scale(0.8);} }
+
+        #wheel {
+            position: absolute; inset: 0; border-radius: 50%;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+            border: 6px solid #fff;
+            z-index: 2;
+        }
+
+        .wheel-text-layer { position: absolute; inset: 0; pointer-events: none; }
+        
+        .prize-label {
+            position: absolute; 
+            top: 50%; left: 50%; 
+            width: 50%; height: 0; 
+            transform-origin: 0% 50%; 
+            display: flex; justify-content: flex-end; align-items: center;
+            padding-right: 35px;
+            box-sizing: border-box;
+            font-weight: 900; font-size: 15px; line-height: 1.3; text-align: right;
+            white-space: pre-line;
+        }
+
+        .pointer {
+            position: absolute; top: -35px; left: 50%; transform: translateX(-50%); z-index: 20;
+            width: 50px; height: 65px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.5));
+            animation: pointerBob 1s ease-in-out infinite;
+        }
+        .pointer::before {
+            content: ''; position: absolute; inset: 0; background: var(--tet-red);
+            clip-path: polygon(50% 100%, 0 15%, 100% 15%); border-top: 8px solid var(--tet-gold);
+        }
+        @keyframes pointerBob { 0%,100%{transform: translateX(-50%) translateY(0);} 50%{transform: translateX(-50%) translateY(-5px);} }
+
+        .center-hub {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 60px; background: #fff; border-radius: 50%;
+            border: 4px solid var(--fpt-orange); z-index: 10;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        #spinBtn {
+            z-index: 10; margin-top: 15px;
+            background: linear-gradient(180deg, #FFD700 0%, #ff8c00 100%);
+            border: 2px solid #fff; color: #b71c1c; 
+            padding: 15px 55px; font-size: 1.6rem; font-weight: 900; 
+            border-radius: 50px; cursor: pointer;
+            box-shadow: 0 6px 0 #a04000, 0 15px 20px rgba(0,0,0,0.4);
+            font-family: 'Montserrat', sans-serif; text-transform: uppercase;
+            animation: btnPulse 1.5s infinite; transition: all 0.1s; letter-spacing: 1px;
+        }
+        
+        #spinBtn:active { transform: translateY(4px); box-shadow: 0 2px 0 #a04000; }
+        #spinBtn:disabled { background: #555; box-shadow: none; cursor: not-allowed; animation: none; color: #fff; }
+
+        /* --- MODAL --- */
+        .modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 999; justify-content: center; align-items: center; backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #D91E18, #900000);
+            border: 4px solid var(--tet-gold); padding: 30px; border-radius: 25px;
+            text-align: center; box-shadow: 0 0 60px rgba(255, 215, 0, 0.6);
+            animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 90%; max-width: 420px;
+        }
+        @keyframes zoomIn { from {transform: scale(0.5); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+        
+        .modal h2 { 
+            font-family: 'Dancing Script', cursive !important;
+            font-size: 3.5rem; color: var(--tet-gold); margin: 0; 
+            text-shadow: 2px 2px 0 #000; line-height: 1.2;
+        }
+        .prize-value {
+            font-size: 3rem; color: #fff; font-weight: 900; margin: 20px 0;
+            text-shadow: 4px 4px 0 #b71c1c, 0 0 20px var(--tet-gold);
+            font-family: 'Montserrat', sans-serif;
+        }
+        .close-btn {
+            background: linear-gradient(to bottom, #FFD700, #FDB931);
+            color: #d35400; border: 2px solid #fff;
+            padding: 12px 40px; font-size: 1.3rem; border-radius: 50px;
+            cursor: pointer; font-weight: 900; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            font-family: 'Montserrat', sans-serif; text-transform: uppercase;
+        }
+        .close-btn:hover { transform: scale(1.05); }
+
+        #secret-area { position: fixed; bottom: 0; right: 0; width: 60px; height: 60px; z-index: 1000; }
+        #reset-btn { position: fixed; top: 5px; left: 5px; opacity: 0.2; font-size: 10px; z-index: 1000; color: #fff; background:none; border: 1px solid #fff; padding: 2px 5px;}
+
+    </style>
+</head>
+<body>
+
+    <div id="welcome-screen">
+        <div class="welcome-content">
+            <div class="welcome-logo">
+                <img src="https://ftel.vn/themes/fpt/assets/images/logo.png?v=3.3" alt="FPT Telecom Logo" style="height: 60px;">
+            </div>
+            <h1 class="welcome-title">Chào Xuân 2026</h1>
+            <p class="welcome-subtitle">Xuân Bính Ngọ - Lộc Về Đầy Nhà</p>
+            <button class="start-btn" onclick="enterParty()">VÀO TIỆC NGAY</button>
+        </div>
+    </div>
+
+    <div id="petal-container"></div>
+
+    <header>
+        <div class="logo-container">
+            <img src="https://ftel.vn/themes/fpt/assets/images/logo.png?v=3.3" alt="FPT Telecom Logo">
+        </div>
+        <h1>Lì Xì May Mắn</h1>
+        <h2>Xuân Bính Ngọ 2026</h2>
+    </header>
+
+    <div class="wheel-wrapper">
+        <div class="wheel-border">
+            <div id="lights" class="lights-ring"></div>
+        </div>
+        <div class="pointer"></div>
+        <div id="wheel">
+            <div class="wheel-text-layer" id="text-layer"></div>
+        </div>
+        <div class="center-hub">
+            <span style="color:var(--fpt-orange); font-weight: 900; font-size: 14px;">QUAY</span>
+        </div>
+    </div>
+
+    <button id="spinBtn">QUAY LẤY LỘC</button>
+
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <h2>Chúc Mừng Năm Mới!</h2>
+            <p style="color:#ffecb3; font-size:1.1rem; margin-top:5px; font-family: 'Montserrat', sans-serif;">Kết quả quay của bạn:</p>
+            <div class="prize-value" id="prizeDisplay">0đ</div>
+            <button class="close-btn" onclick="closeModal()">NHẬN THƯỞNG</button>
+        </div>
+    </div>
+
+    <div id="secret-area" onclick="toggleCheat()"></div>
+    <button id="reset-btn" onclick="resetGame()">Reset</button>
+
+    <audio id="bgMusic" loop><source src="https://files.catbox.moe/082klg.mp3" type="audio/mpeg"></audio>
+    <audio id="tickSound"><source src="https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3" type="audio/mpeg"></audio>
+    <audio id="winSound"><source src="https://cdn.pixabay.com/audio/2021/08/04/audio_0625c153e2.mp3" type="audio/mpeg"></audio>
+
+    <script>
+        function enterParty() {
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const bgMusic = document.getElementById('bgMusic');
+            welcomeScreen.style.opacity = '0';
+            bgMusic.volume = 0.5;
+            bgMusic.play().catch(e => console.log("Lỗi tự động phát nhạc:", e));
+            setTimeout(() => { welcomeScreen.style.display = 'none'; }, 500);
+        }
+
+        // --- 1. CONFIG ---
+        const prizes = [
+            { text: "Chúc Bạn\nMay Mắn", fullText: "Chúc bạn may mắn\nlần sau!", percent: 30,  color: "#FFFFFF", textCol: "#D91E18", fontSize: "12px" }, 
+            { text: "5k",      percent: 25,  color: "#D91E18", textCol: "#FFFFFF" }, 
+            { text: "10k",     percent: 20,  color: "#FFFFFF", textCol: "#D91E18" },
+            { text: "20k",     percent: 10,  color: "#D91E18", textCol: "#FFFFFF" },
+            { text: "50k",     percent: 8,   color: "#FFFFFF", textCol: "#D91E18" },
+            { text: "100k",    percent: 5,   color: "#D91E18", textCol: "#FFFFFF" },
+            { text: "500k",    percent: 1.5, color: "#FFFFFF", textCol: "#D91E18" },
+            { text: "1 TRIỆU", percent: 0.5, color: "#FFD700", textCol: "#D91E18" }
+        ];
+
+        // --- 2. SETUP VISUALS ---
+        function createPetals() {
+            const container = document.getElementById('petal-container');
+            for(let i=0; i<40; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.width = (Math.random() * 10 + 10) + 'px';
+                petal.style.height = (Math.random() * 10 + 10) + 'px';
+                petal.style.background = Math.random() > 0.5 ? '#FFD700' : '#ff9999';
+                petal.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                petal.style.animationDelay = (Math.random() * 5) + 's';
+                container.appendChild(petal);
+            }
+        }
+        createPetals();
+
+        function createLights() {
+            const container = document.getElementById('lights');
+            const total = 24; const radius = 175; const step = 360/total;
+            for(let i=0; i<total; i++) {
+                const bulb = document.createElement('div');
+                bulb.className = 'bulb';
+                const angle = i * step * (Math.PI/180);
+                const x = 180 + radius * Math.cos(angle) - 5; 
+                const y = 180 + radius * Math.sin(angle) - 5;
+                bulb.style.left = x + 'px'; bulb.style.top = y + 'px';
+                bulb.style.animationDelay = (i%2==0 ? '0s' : '0.5s');
+                container.appendChild(bulb);
+            }
+        }
+        createLights();
+
+        const wheel = document.getElementById('wheel');
+        const textLayer = document.getElementById('text-layer');
+        
+        function initWheel() {
+            const deg = 360 / prizes.length;
+            let gradient = 'conic-gradient('; 
+            let currentDeg = 0;
+            
+            prizes.forEach(p => {
+                gradient += `${p.color} ${currentDeg}deg ${currentDeg + deg}deg, `;
+                currentDeg += deg;
+            });
+            wheel.style.background = gradient.slice(0, -2) + ')';
+            
+            textLayer.innerHTML = '';
+            prizes.forEach((p, i) => {
+                const label = document.createElement('div');
+                label.className = 'prize-label';
+                label.innerText = p.text;
+                label.style.color = p.textCol;
+                if(p.fontSize) label.style.fontSize = p.fontSize;
+                const rotate = (i * deg + (deg / 2)) - 90; 
+                label.style.transform = `rotate(${rotate}deg)`; 
+                if(p.color === '#FFFFFF') label.style.textShadow = '0 0 2px rgba(0,0,0,0.3)';
+                textLayer.appendChild(label);
+            });
+        }
+        initWheel();
+
+        let rotation = 0;
+        let isSpinning = false;
+        let isIdle = true;
+        let cheatMode = false; let cheatCount = 0;
+        const spinBtn = document.getElementById('spinBtn');
+        const tickSound = document.getElementById('tickSound');
+        
+        function idleLoop() {
+            if (isIdle) {
+                rotation += 0.2;
+                wheel.style.transform = `rotate(${rotation}deg)`;
+                requestAnimationFrame(idleLoop);
+            }
+        }
+        idleLoop();
+
+        spinBtn.addEventListener('click', () => {
+            if (localStorage.getItem('fpt_final_v10')) {
+                alert("Bạn đã nhận lộc rồi!"); return;
+            }
+            if (isSpinning) return;
+
+            document.getElementById('bgMusic').volume = 0.4;
+            document.getElementById('bgMusic').play().catch(()=>{});
+
+            isIdle = false;
+            isSpinning = true;
+            spinBtn.disabled = true;
+
+            const winIndex = cheatMode ? (prizes.length - 1) : getWeightedRandom();
+            const sliceDeg = 360 / prizes.length;
+            
+            const targetWedgeCenter = (winIndex * sliceDeg) + (sliceDeg / 2);
+            const targetRotationDegrees = 360 - targetWedgeCenter;
+            const extraSpins = 360 * 5; 
+            
+            const safeZone = sliceDeg * 0.5;
+            const randomOffset = (Math.random() * safeZone) - (safeZone / 2);
+
+            const currentCircle = Math.ceil(rotation / 360) * 360;
+            const finalDestination = currentCircle + extraSpins + targetRotationDegrees + randomOffset;
+            
+            wheel.style.transition = "transform 5s cubic-bezier(0.25, 0.1, 0.25, 1)";
+            wheel.style.transform = `rotate(${finalDestination}deg)`;
+            rotation = finalDestination;
+
+            let step = 50;
+            let tickTimer = setTimeout(function runTick() {
+                if (!isSpinning) return;
+                tickSound.pause(); tickSound.currentTime = 0; tickSound.play().catch(()=>{});
+                if (step < 400) step += 10;
+                tickTimer = setTimeout(runTick, step);
+            }, 50);
+
+            setTimeout(() => {
+                isSpinning = false; clearTimeout(tickTimer);
+                localStorage.setItem('fpt_final_v10', 'true');
+                showResult(prizes[winIndex]);
+            }, 5000);
+        });
+
+        function getWeightedRandom() {
+            const r = Math.random() * 100; let s = 0;
+            for(let i=0; i<prizes.length; i++) { s+=prizes[i].percent; if(r<s) return i; } return 0;
+        }
+
+        function showResult(prize) {
+            document.getElementById('winSound').play();
+            document.getElementById('prizeDisplay').innerText = prize.fullText || prize.text;
+            document.getElementById('resultModal').style.display = 'flex';
+            fireConfetti();
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').style.display = 'none';
+            spinBtn.innerText = "CHÚC MỪNG NĂM MỚI";
+        }
+
+        function toggleCheat() {
+            cheatCount++; 
+            if(cheatCount >= 3){ 
+                cheatMode = !cheatMode; 
+                console.log("VIP Mode:", cheatMode); 
+                if (navigator.vibrate) navigator.vibrate(200); 
+                cheatCount = 0;
+            }
+        }
+
+        function resetGame() { localStorage.removeItem('fpt_final_v10'); location.reload(); }
+        
+        function fireConfetti() {
+            const duration = 3000; const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FFD700', '#D91E18'], zIndex: 9999 });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FFD700', '#D91E18'], zIndex: 9999 });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+    </script>
+</body>
+</html>
