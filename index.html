@@ -21,44 +21,36 @@
             display: flex; flex-direction: column; align-items: center;
             height: 100vh;
             user-select: none;
-            position: relative; /* Quan trọng để định vị các lớp giả */
+            position: relative; 
         }
 
         /* === XỬ LÝ BACKGROUND CHÍNH CHO MỊN === */
-        /* Lớp 1: Ảnh nền chính (Dùng ::before để xử lý chất lượng ảnh riêng biệt) */
         body::before {
             content: '';
-            position: fixed; /* Đảm bảo phủ kín màn hình không bị trượt */
+            position: fixed; 
             inset: 0;
             background: url('https://i.postimg.cc/0rZFG1Sz/image.png') no-repeat center center;
             background-size: cover;
-            z-index: -2; /* Nằm dưới cùng */
-
-            /* Cải thiện chất lượng render ảnh khi bị co giãn */
-            image-rendering: -webkit-optimize-contrast; /* Cho Chrome/Safari */
-            image-rendering: high-quality; /* Chuẩn mới */
-            /* Thêm một chút blur cực nhẹ (0.5px) để làm mịn các chi tiết sắc cạnh gây cảm giác bị bể */
+            z-index: -2; 
+            image-rendering: -webkit-optimize-contrast; 
+            image-rendering: high-quality; 
             filter: blur(0.5px);
         }
 
-        /* Lớp 2: Lớp phủ làm tối (Giữ nguyên hiệu ứng bạn thích) */
         body::after {
             content:'';
             position: fixed;
             inset:0;
-            background: rgba(0, 0, 0, 0.15); /* Tăng nhẹ lên 0.15 cho đằm màu hơn xíu */
-            z-index:-1; /* Nằm trên ảnh nền, dưới nội dung */
+            background: rgba(0, 0, 0, 0.15); 
+            z-index:-1; 
             pointer-events: none;
         }
-        /* ====================================== */
-
 
         /* ==========================================================================
            MÀN HÌNH CHÀO (WELCOME SCREEN)
            ========================================================================== */
         #welcome-screen {
             position: fixed; inset: 0;
-            /* Background hoa mai */
             background: url('https://cellphones.com.vn/sforum/wp-content/uploads/2022/12/hinh-nen-powerpoint-tet-15-2.png') no-repeat center center;
             background-size: cover;
             z-index: 99999;
@@ -66,11 +58,10 @@
             transition: opacity 0.5s ease;
         }
 
-        /* Lớp phủ mờ để chữ nổi bật trên nền hoa mai */
         #welcome-screen::before {
             content: "";
             position: absolute; inset: 0;
-            background: rgba(255, 255, 255, 0.3); /* Phủ trắng mờ nhẹ */
+            background: rgba(255, 255, 255, 0.3); 
             backdrop-filter: blur(2px);
             z-index: -1;
         }
@@ -79,10 +70,10 @@
             text-align: center; 
             padding: 40px; 
             z-index: 10;
-            background: rgba(255, 255, 255, 0.85); /* Khung trắng mờ */
+            background: rgba(255, 255, 255, 0.85); 
             border-radius: 30px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            border: 2px solid #D91E18; /* Viền đỏ */
+            border: 2px solid #D91E18; 
             animation: zoomIn 0.8s ease;
             max-width: 90%;
         }
@@ -93,7 +84,7 @@
         
         .welcome-title { 
             font-family: 'Dancing Script', cursive; font-size: 3.5rem; 
-            color: #D91E18; /* Chữ đỏ đậm trên nền sáng */
+            color: #D91E18; 
             text-shadow: 1px 1px 0 #fff; 
             margin: 0; line-height: 1.2;
         }
@@ -117,8 +108,6 @@
 
         @keyframes zoomIn { from {opacity: 0; transform: scale(0.8);} to {opacity: 1; transform: scale(1);} }
         @keyframes pulseBtn { 0% {transform: scale(1);} 50% {transform: scale(1.05);} 100% {transform: scale(1);} }
-        /* ========================================================================== */
-
 
         /* --- HOA RƠI --- */
         #petal-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
@@ -264,7 +253,7 @@
         }
         .close-btn:hover { transform: scale(1.05); }
 
-        #secret-area { position: fixed; bottom: 0; right: 0; width: 60px; height: 60px; z-index: 1000; }
+        /* ĐÃ XÓA CSS NÚT CHEAT */
         #reset-btn { position: fixed; top: 5px; left: 5px; opacity: 0.2; font-size: 10px; z-index: 1000; color: #fff; background:none; border: 1px solid #fff; padding: 2px 5px;}
 
     </style>
@@ -316,7 +305,6 @@
         </div>
     </div>
 
-    <div id="secret-area" onclick="toggleCheat()"></div>
     <button id="reset-btn" onclick="resetGame()">Reset</button>
 
     <audio id="bgMusic" loop><source src="https://files.catbox.moe/082klg.mp3" type="audio/mpeg"></audio>
@@ -333,16 +321,16 @@
             setTimeout(() => { welcomeScreen.style.display = 'none'; }, 500);
         }
 
-        // --- 1. CONFIG ---
+        // --- 1. CONFIG TỈ LỆ MỚI (TỔNG 100%) ---
         const prizes = [
-            { text: "Chúc Bạn\nMay Mắn", fullText: "Chúc bạn may mắn\nlần sau!", percent: 30,  color: "#FFFFFF", textCol: "#D91E18", fontSize: "12px" }, 
+            { text: "Chúc Bạn\nMay Mắn", fullText: "Chúc bạn may mắn\nlần sau!", percent: 45,  color: "#FFFFFF", textCol: "#D91E18", fontSize: "12px" }, 
             { text: "5k",      percent: 25,  color: "#D91E18", textCol: "#FFFFFF" }, 
-            { text: "10k",     percent: 20,  color: "#FFFFFF", textCol: "#D91E18" },
+            { text: "10k",     percent: 15,  color: "#FFFFFF", textCol: "#D91E18" },
             { text: "20k",     percent: 10,  color: "#D91E18", textCol: "#FFFFFF" },
-            { text: "50k",     percent: 8,   color: "#FFFFFF", textCol: "#D91E18" },
-            { text: "100k",    percent: 5,   color: "#D91E18", textCol: "#FFFFFF" },
-            { text: "500k",    percent: 1.5, color: "#FFFFFF", textCol: "#D91E18" },
-            { text: "1 TRIỆU", percent: 0.5, color: "#FFD700", textCol: "#D91E18" }
+            { text: "50k",     percent: 4,   color: "#FFFFFF", textCol: "#D91E18" },
+            { text: "100k",    percent: 1,   color: "#D91E18", textCol: "#FFFFFF" },
+            { text: "500k",    percent: 0,   color: "#FFFFFF", textCol: "#D91E18" }, // 0%
+            { text: "1 TRIỆU", percent: 0,   color: "#FFD700", textCol: "#D91E18" }  // 0%
         ];
 
         // --- 2. SETUP VISUALS ---
@@ -410,7 +398,6 @@
         let rotation = 0;
         let isSpinning = false;
         let isIdle = true;
-        let cheatMode = false; let cheatCount = 0;
         const spinBtn = document.getElementById('spinBtn');
         const tickSound = document.getElementById('tickSound');
         
@@ -436,7 +423,8 @@
             isSpinning = true;
             spinBtn.disabled = true;
 
-            const winIndex = cheatMode ? (prizes.length - 1) : getWeightedRandom();
+            // Đã xóa check cheatMode, chỉ dùng random thuần
+            const winIndex = getWeightedRandom();
             const sliceDeg = 360 / prizes.length;
             
             const targetWedgeCenter = (winIndex * sliceDeg) + (sliceDeg / 2);
@@ -485,15 +473,7 @@
             spinBtn.innerText = "CHÚC MỪNG NĂM MỚI";
         }
 
-        function toggleCheat() {
-            cheatCount++; 
-            if(cheatCount >= 3){ 
-                cheatMode = !cheatMode; 
-                console.log("VIP Mode:", cheatMode); 
-                if (navigator.vibrate) navigator.vibrate(200); 
-                cheatCount = 0;
-            }
-        }
+        // ĐÃ XÓA HÀM TOGGLE CHEAT ĐỂ ĐẢM BẢO AN TOÀN
 
         function resetGame() { localStorage.removeItem('fpt_final_v10'); location.reload(); }
         
